@@ -26,3 +26,8 @@ app.post('/todos' , (req,res) => {
 app.listen(port,() => {
     console.info('server started at port '+port);
 });
+
+//export app so that it can be accessed in test scripts
+module.exports = {
+    app
+}
