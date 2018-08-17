@@ -9,6 +9,7 @@ const port = 3000;
 
 app.use(bodyParser.json());
 
+//create todo
 app.post('/todos' , (req,res) => {
     var todo = new Todo({
         text: req.body.text
@@ -19,6 +20,15 @@ app.post('/todos' , (req,res) => {
         res.send(doc);
     },(err) => {
         //console.error(err);
+        res.status(500).send(err);
+    });
+});
+
+//list todos
+app.get('/todos',(req,res) => {
+    Todo.find({}).then((todos) => {
+        res.send({todos});
+    },(err) => {
         res.status(500).send(err);
     });
 });
