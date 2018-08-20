@@ -63,6 +63,25 @@ app.get('/todos/:id' , (req,res) => {
     });
 });
 
+//remove doc by id
+app.delete('/todos/:id' , (req,res) => {
+    var id = req.params.id;
+
+    //if id not valid then return 404
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send();
+    }
+
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if(!todo){
+            return res.send(404).send();
+        }
+        return res.send(todo);
+    }).catch((err) => {
+        return res.status(500).send(err);
+    })
+});
+
 app.listen(port,() => {
     console.info('server started at port '+port);
 });
