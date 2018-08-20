@@ -53,7 +53,7 @@ app.get('/todos/:id' , (req,res) => {
             return res.status(404).send({});            
         }
         console.log('Todo found for : ',id);
-        return res.send(JSON.stringify({todo},undefined,2));
+        return res.send({todo});
     } , (err) => {
         console.error('Error while fetching Todo  ',err);
         return res.status(500).send(err);
