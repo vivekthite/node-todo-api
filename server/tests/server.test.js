@@ -7,6 +7,7 @@ const {Todo} = require('../models/todo');
 
 const id1 = new ObjectID().toHexString();
 const id2 = new ObjectID().toHexString();
+const completedAt = new Date().getTime();
  
 const todos = [
     {
@@ -15,7 +16,9 @@ const todos = [
     },
     {
         _id: id2,
-        text: 'Second test todo'
+        text: 'Second test todo',
+        completed: true,
+        completedAt: completedAt
     }
 ];
 
@@ -163,4 +166,65 @@ describe('DELETE /todos/:id' , () => {
             ;
     });
 
+});
+
+describe('PATCH /todos/:id' , () => {
+    it('should return 404 for invalid id' , (done) => {
+        request(app)
+            .patch('/todos/'+123)
+            .send({})
+            .expect(404)
+            .end(done)
+            ;
+    });
+
+    it('should return 404 for non exist id' , (done) => {
+        request(app)
+            .patch('/todos/'+new ObjectID().toHexString())
+            .send({})
+            .expect(404)
+            .end(done)
+            ;
+    });
+
+    it('should update the todo' , (done) => {
+        var text = 'updated';
+        request(app)
+            .patch('/todos/'+id1)
+            .send({completed: true,text: text})
+            .expect(200)
+            .end((err,res) => {
+                if(err){
+                    return done(err);
+                }
+
+                Todo.findById(id1).then((todo) => {
+                    expect(todo.completed).toBe(true);
+                    expect(todo.completedAt).toBeA('number');
+                    expect(todo.text).toBe(text);
+                    done();
+                }).catch((err) => done(err))
+            })
+            ;
+    });
+
+    it('should clear completedAt when todo is not completed' , (done) => {
+        request(app)
+            .patch('/todos/'+id2)
+            .send({completed:false})
+            .expect(200)
+            .end((err,res) => {
+                if(err){
+                    return done(err);
+                }
+
+                Todo.findById(id2).then((todo) => {
+                    expect(todo.completed).toBe(false);
+                    expect(todo.completedAt).toNotExist();
+                    expect(todo.text).toBe(todos[1].text);
+                    done();
+                }).catch((err) => done(err))
+            })
+            ;
+    });
 });
