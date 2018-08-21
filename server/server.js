@@ -125,6 +125,17 @@ app.patch('/todos/:id' , (req,res) => {
 
 });
 
+//create new user
+app.post('/users' , (req,res) => {    
+    var user = new User(_.pick(req.body,['email','password']));
+    user.save().then((user) => {
+        return res.send({user});
+    }).catch((err) => {
+        console.error(err);
+        return res.status(500).send(err);
+    });
+});
+
 app.listen(port,() => {
     console.info('server started at port '+port);
 });
