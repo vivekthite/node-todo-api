@@ -127,10 +127,15 @@ app.patch('/todos/:id' , (req,res) => {
 
 //create new user
 app.post('/users' , (req,res) => {    
-    var user = new User(_.pick(req.body,['email','password']));
-    user.save().then((user) => {
-        return res.send({user});
-    }).catch((err) => {
+    var user = new User(_.pick(req.body,['email','password'])); 
+    var access = "auth";
+    var token = user.generateAuthToken(access);
+    user.tokens.push({access,token});
+    //console.log('user',user);   
+    user.save().then((savedUser) => {        
+        return res.header('x-auth',token).send(savedUser);
+    })    
+    .catch((err) => {
         console.error(err);
         return res.status(500).send(err);
     });
