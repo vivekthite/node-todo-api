@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const {sign} = require('jsonwebtoken');
+const {sign,verify} = require('jsonwebtoken');
 const {pick} = require('lodash');
 
 var userSchema = new mongoose.Schema({
@@ -44,6 +44,18 @@ userSchema.methods.generateAuthToken = function(access) {
 
 userSchema.methods.toJSON = function() {
     return pick(this,['_id','email']);
+};
+
+userSchema.statics.findByToken = function(token){    
+    var decoded;
+    try {
+        decoded = verify(token,'abc123');
+    } catch (error) {
+        return Promise.reject();
+    }
+    return this.findOne({
+        'tokens.token': token
+    });
 };
 
 var User = mongoose.model('users',userSchema);
