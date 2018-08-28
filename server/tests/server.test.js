@@ -327,8 +327,26 @@ describe('GET /users/me' , () => {
             .expect(401)
             .end(done);            
     });
+});
 
-
+describe('POST /users/login' , () => {
+    it('should allow user to login' , (done) => {
+        request(app)
+            .post('/users/login')
+            .send({
+                email: users[0].email,
+                password: users[0].password
+            })
+            .expect(200)
+            .end((err,res) => {
+                if(err){
+                    return done(err);
+                }
+                expect(res.get('x-auth')).toBe(users[0].tokens[0].token);
+                done();
+            })
+            .catch((err) => done(err));
+    });
 });
 
 

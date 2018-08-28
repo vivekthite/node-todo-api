@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const {sign,verify} = require('jsonwebtoken');
 const {pick} = require('lodash');
-const {genSalt,hash} = require('bcryptjs');
+const {genSalt,hash,compare} = require('bcryptjs');
 
 var userSchema = new mongoose.Schema({
     email: {
@@ -59,6 +59,28 @@ userSchema.statics.findByToken = function(token){
         'tokens.access': decoded.access,
         'tokens.token': token
     });
+};
+
+userSchema.statics.findByCredentials = function(email,password) {
+    return this.findOne({email})
+        .then((user) => {
+            if(!user){
+                return Promise.reject();                
+            }
+            
+            return new Promise((resolve,reject) => {
+                compare(password,user.password)
+                    .then((result) => {
+                        if(result){
+                            resolve(user);
+                        }else{
+                            reject();
+                        }
+                    });
+            });
+        });
+        
+        
 };
 
 userSchema.pre('save', function(next){   
