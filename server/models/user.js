@@ -55,6 +55,8 @@ userSchema.statics.findByToken = function(token){
         return Promise.reject();
     }
     return this.findOne({
+        _id: decoded.id,
+        'tokens.access': decoded.access,
         'tokens.token': token
     });
 };

@@ -11,7 +11,11 @@ const authenticate = (req,res,next) =>{
         req.token = token;
         next();
     })
-    .catch((e) => res.status(401).send())
+    .catch((e) => {
+        //console.log('error',e);
+        res.status(401).send();
+    }    
+    )
     ; 
 };
 
