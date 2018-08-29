@@ -47,6 +47,16 @@ userSchema.methods.generateAuthTokenAndSave = function() {
     });
 }; 
 
+userSchema.methods.deleteToken = function(token){
+    return this.update({
+      $pull: {
+        tokens: {
+            token
+        }
+      }  
+    });
+};
+
 userSchema.methods.toJSON = function() {
     return pick(this,['_id','email']);
 };

@@ -393,7 +393,48 @@ describe('POST /users/login' , () => {
          });
      });
     });
+});
 
+describe('DELETE /users/me/token' ,() => {   
+    it('should delete the token' , (done) => {
+        var email = users[0].email;
+        var xAuth = users[0].tokens[0].token;
+        request(app)
+            .delete('/users/me/token')
+            .set('x-auth',xAuth)
+            .expect(200)
+            .end((err,res) => {
+                if(err){
+                    return done(err);
+                }
+
+                User.findOne({email}).then((user) => {
+                    expect(user.tokens.length).toBe(0);
+                    done();
+                });
+            })
+    });
+
+    it('should not delete the token' , (done) => {
+        var email = users[0].email;
+        var xAuth = 'invalid-token';
+        request(app)
+            .delete('/users/me/token')
+            .set('x-auth',xAuth)
+            .expect(401)
+            .end((err,res) => {
+                if(err){
+                    return done(err);
+                }
+
+                User.findOne({email}).then((user) => {
+                    expect(user.tokens.length).toBe(1);
+                    done();
+                })
+                .catch((err) => done(err))
+                ;
+            })
+    });
 });
 
 
