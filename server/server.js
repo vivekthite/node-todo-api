@@ -129,17 +129,15 @@ app.patch('/todos/:id' , (req,res) => {
 //create new user
 app.post('/users' , (req,res) => {    
     var user = new User(_.pick(req.body,['email','password'])); 
-    var access = "auth";
-    var token = user.generateAuthToken(access);
-    user.tokens.push({access,token});
-    //console.log('user',user);   
-    user.save().then((savedUser) => {        
-        return res.header('x-auth',token).send(savedUser);
-    })    
+    
+    user.generateAuthTokenAndSave().then((token) => {
+         res.header('x-auth',token).send(user);
+    })
     .catch((err) => {
-        console.error(err);
-        return res.status(500).send(err);
-    });
+        //console.error(err);
+        res.status(500).send(err);
+    })
+    ;    
 });
 
 //get user info
@@ -150,10 +148,13 @@ app.get('/users/me' ,authenticate, (req,res) => {
 //user login
 app.post('/users/login' , (req,res) => {
     var body = _.pick(req.body,['email','password']);
+    //console.log(body);
     User
         .findByCredentials(body.email,body.password)
         .then((user) => {
-            res.header('x-auth',user.tokens[0].token).send(user);
+            user.generateAuthTokenAndSave().then((token) => {
+                res.header('x-auth',token).send(user);
+            });           
         })
         .catch((err) => res.status(401).send())
         ;   

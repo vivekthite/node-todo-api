@@ -38,9 +38,13 @@ var userSchema = new mongoose.Schema({
   });
 
 
-userSchema.methods.generateAuthToken = function(access) {   
-    var token = sign({id: this._id.toHexString(),access},'abc123').toString();        
-    return token;
+userSchema.methods.generateAuthTokenAndSave = function() { 
+    var access = 'auth';  
+    var token = sign({id: this._id.toHexString(),access},'abc123').toString();
+    this.tokens.push({access,token});
+    return this.save().then(() => {
+        return token;
+    });
 }; 
 
 userSchema.methods.toJSON = function() {

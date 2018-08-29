@@ -330,23 +330,70 @@ describe('GET /users/me' , () => {
 });
 
 describe('POST /users/login' , () => {
-    it('should allow user to login' , (done) => {
+   it('should allow user to login' , (done) => {
+       var email = users[1].email;
+       var password = users[1].password;
         request(app)
             .post('/users/login')
             .send({
-                email: users[0].email,
-                password: users[0].password
+                email: email,
+                password: password
             })
             .expect(200)
+            .expect((res) => {
+                //console.log(res.get('x-auth'));
+                expect(res.get('x-auth')).toExist();
+                expect(res.body._id).toBe(users[1]._id.toHexString());
+                expect(res.body.email).toBe(users[1].email);
+            })
             .end((err,res) => {
                 if(err){
                     return done(err);
                 }
-                expect(res.get('x-auth')).toBe(users[0].tokens[0].token);
-                done();
+
+                User.findOne({email}).then((user) => {
+                    expect(user.tokens.length).toBe(1);
+                    expect(user.tokens[0].token).toBe(res.get('x-auth'));
+                    expect(res.body._id).toBe(user._id.toHexString());
+                    expect(res.body.email).toBe(user.email);
+                    done();
+                })
             })
-            .catch((err) => done(err));
+            ;
+   });
+
+   it('should not allow user to login if email is not in system',(done) => {
+        request(app)
+         .post('/users/login')
+         .send({
+             email: 'abcddef@gmail.com',
+             password: 'abc123'
+         })
+         .expect(401)
+         .end(done);
+   });
+
+   it('should not allow user to login if email is in system but password is incorrect',(done) => {
+       var email = users[1].email;
+    request(app)
+     .post('/users/login')
+     .send({
+         email: email,
+         password: 'abc123'
+     })
+     .expect(401)
+     .end((err,res) => {
+         if(err){
+             return done(err);
+         }
+
+         User.findOne({email}).then((user) => {
+            expect(user.tokens.length).toBe(0);
+            done();
+         });
+     });
     });
+
 });
 
 
