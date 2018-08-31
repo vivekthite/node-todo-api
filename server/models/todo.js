@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-var Todo = mongoose.model('Todo' , {
+var todoSchema = new mongoose.Schema({
     text : {
         type: String,
         required: true,
@@ -14,8 +14,14 @@ var Todo = mongoose.model('Todo' , {
     completedAt: {
         type: Number,
         default: null
+    },
+    _creator:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     }
 });
+
+var Todo = mongoose.model('Todo',todoSchema);
 
 module.exports = {
     Todo
