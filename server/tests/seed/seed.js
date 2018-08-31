@@ -13,7 +13,7 @@ const {User} = require('../../models/user');
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
 const access = 'auth';
-const token = sign({id: userOneId.toHexString(),access},'abc123').toString();
+const token = sign({id: userOneId.toHexString(),access},process.env.JWT_SECRET).toString();
 const users = [
     {
         _id: userOneId,

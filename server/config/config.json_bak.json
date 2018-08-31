@@ -1,0 +1,11 @@
+{
+    "test" :{
+        "PORT": 4000,
+        "MONGODB_URI": "mongodb://docker-host:27017/TodoAppTest"
+    },
+
+    "development" : {
+        "PORT": 3000,
+        "MONGODB_URI": "mongodb://docker-host:27017/TodoApp"
+    }
+}

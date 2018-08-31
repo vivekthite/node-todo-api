@@ -40,7 +40,7 @@ var userSchema = new mongoose.Schema({
 
 userSchema.methods.generateAuthTokenAndSave = function() { 
     var access = 'auth';  
-    var token = sign({id: this._id.toHexString(),access},'abc123').toString();
+    var token = sign({id: this._id.toHexString(),access},process.env.JWT_SECRET).toString();
     this.tokens.push({access,token});
     return this.save().then(() => {
         return token;
@@ -64,7 +64,7 @@ userSchema.methods.toJSON = function() {
 userSchema.statics.findByToken = function(token){    
     var decoded;
     try {
-        decoded = verify(token,'abc123');
+        decoded = verify(token,process.env.JWT_SECRET);
     } catch (error) {
         return Promise.reject();
     }
